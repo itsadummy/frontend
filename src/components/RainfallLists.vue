@@ -1,6 +1,6 @@
 <template>
     <div class="rainfall_list">
-        <strong>Rainfall Activity List</strong>
+        <!---<strong>Rainfall Activity List</strong>-->
         <b-card> 
             
             <table class="table table-striped table-sm table-light table-hover mt-1"> 
@@ -13,9 +13,9 @@
                 </thead>
                 <tbody>
                 <tr v-for="rainfall in rainfallsData" v-bind:key="rainfall" :style="{height: '20px'}">
-                    <td :style="{width: '250px'}">{{rainfall.raintype}}</td>
-                    <td :style="{width: '250px'}">{{rainfall.status}}</td>
-                    <td :style="{width: '500px'}"> {{rainfall.measurement}}</td>
+                    <td :style="{width: '250px'}">{{rainfall.level}}</td>
+                    <td :style="{width: '250px'}">{{rainfall.amount}}</td>
+                    <td :style="{width: '500px'}"> {{rainfall.timestamp}}</td>
                 </tr>
                 </tbody>
             </table> 
@@ -38,13 +38,14 @@ export default {
         return {
             rainfalls:[],
             currentPage: 1,
-            pageSize: 5,
+            pageSize: 4,
             totalRows: 0
         }
     },
 
     created:function() {
-        fetch('http://127.0.0.1:8000/api/appapi/')
+        //fetch('http://127.0.0.1:8000/api/appapi/') api sa backend koto
+        fetch('https://mdrrmo-scl.herokuapp.com/api/v1/rainfall.json')
         .then(res => res.json())
         .then(res => {
         this.rainfalls = res;
