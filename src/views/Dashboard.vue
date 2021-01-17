@@ -4,23 +4,13 @@
         <Sidebar/>
 
         <b-container class="container">
-            <b-row class="mt-3 ml-3">
+            <b-row class="mt-1 ml-3">
                 <b-col class="sm-6">
                     <div class="rainfall-activities">
-                        <b-card no-body>
-                        <b-tabs pills card 
-                        active-nav-item-class="bg-secondary text-white"
-                        align="right"
-                        >
-                            <b-tab title="Day" active><b-card-text></b-card-text>
-                            <RainfallActivities/>
-                            </b-tab>
-                            <b-tab title="Week"><b-card-text></b-card-text>
-                            <ByWeek/>
-                            </b-tab>
-                            <b-tab title="Month"><b-card-text></b-card-text></b-tab>
-                            <b-tab title="Year"><b-card-text></b-card-text></b-tab>
-                            </b-tabs>
+                        <b-card class="mt-1">
+                            <div>
+                                <RainfallActivities :style="{height: '300px', width:'550px'}"/>
+                            </div>
                         </b-card>
                     </div>
 
@@ -79,7 +69,7 @@ import Sidebar from '../components/Sidebar'
 import RainfallActivities from '../components/RainfallActivities'
 import RainfallLists from '../components/RainfallLists'
 import CurrentWeather from '../components/CurrentWeather'
-import ByWeek from '../components/ByWeek'
+//import ByWeek from '../components/ByWeek'
 
 export default {
     name: 'Dashboard',
@@ -90,7 +80,7 @@ export default {
         RainfallLists,
         RainfallActivities,
         CurrentWeather,
-        ByWeek
+//        ByWeek
     },
 
   methods: {
