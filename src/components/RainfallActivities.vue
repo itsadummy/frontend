@@ -1,69 +1,144 @@
 <template>
-  <div class="rainfall_activities">
-            <div class="linechart" v-if="arrPositive.length > 0">
-                <line-chart :chartData="arrPositive" :options="chartOptions" label="Legend" />
-            </div>
+  <div>
+      <div>
+          <b-button-group class="btn-group btn-group-sm">
+              <b-button class="btn btn-outline-dark" variant="white">Day</b-button>
+              <b-button class="btn btn-outline-dark text-white" variant="dark">Week</b-button>
+              <b-button class="btn btn-outline-dark" variant="white">Mon</b-button>
+              <b-button class="btn btn-outline-dark text-white" variant="dark">Year</b-button>
+          </b-button-group>
+      </div>
+
+      <byWeekLine v-if="ChartConfig.labels.length" 
+      :bar-data="ChartConfig" :chart-options="options"
+      :style="{height: '290px'}"/>
   </div>
 </template>
 
 <script>
-import LineChart from '../components/LineChart'
+import byWeekLine from '../components/byWeekLine.js'
 import axios from 'axios'
-import moment from 'moment'
-
 export default {
-    name: 'RainfallActivities',
-
     components: {
-        LineChart,
+        byWeekLine,
     },
 
     data() {
         return {
-            arrPositive: [],
-            arrHospitalized: [],
-            arrInIcu: [],
-            arrOnVentilator: [],
-            arrRecovered: [],
-            arrDeath: []
+            ChartConfig: {
+                labels: [],
+                level: [],
+                datasets: [
+                    {
+                    data: [], 
+                    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                    "fill": false,
+                    
+                    borderColor: 'lightpink',
+                    pointBackgroundColor: 'red',
+                    borderWidth: 1,
+                    pointBorderColor: 'red',
+                    label: "Amount "
+                    },
+                    {
+                    data: [], 
+                    backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                    "fill": false,
+                    borderColor: 'lightblue',
+                    pointBackgroundColor: 'lightblue',
+                    borderWidth: 1,
+                    pointBorderColor: 'lightblue',
+                    label: "Level "
+                   
+                    },
+                ]   
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                  position: 'bottom'
+                },
+                layout: {
+                  padding: {
+                    left: 25,
+                    right: 0,
+                    bottom: 0
+                  }
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true,
+                },
+                scales: {
+                    xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Day'
+                    }
+                    }],
+                    yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value per ticks'
+                    }
+                    }]
+                }
+            },
         }
     },
+    mounted: function () {
+        this.getListData();
+    },
 
-    async created(){
-        const {data} = await axios.get('https://api.covidtracking.com/v1/us/daily.json');
-        //console.log(data)
-        data.forEach(d => {
-            const date = moment(d.date, "YYYYMMDD").format("MM/DD");
+    methods: {
+    getListData: async function () {
 
-            const {
-                positive,
-                hospitalizedCumulative,
-                inIcuCurrently,
-                onVentilatorCumulative,
-                recovered,
-                death
-            } = d;
-
-            this.arrPositive.push({date, total: positive});
-            this.arrHospitalized.push({date, total: hospitalizedCumulative});
-            this.arrInIcu.push({date, total: inIcuCurrently});
-            this.arrOnVentilator.push({date, total: onVentilatorCumulative});
-            this.arrRecovered.push({date, total: recovered});
-            this.arrDeath.push({date, total: death});
-           
-
-            console.log(this.arrPositive);
-            console.log(this.arrHospitalized);
-            console.log(this.arrInIcu);
-            console.log(this.arrOnVentilator);
-            console.log(this.arrRecovered);
-            console.log(this.arrDeath);
-        }) 
+      this.status = "getting data...";
+     // var that = this;
         
+        await axios.get("https://mdrrmo-scl.herokuapp.com/api/v1/rainfall.json").then((response) => {
+        //await axios.get("http://127.0.0.1:8000/api/appapi/").then((response) => {
+        //await axios.get("https://api.covidtracking.com/v1/us/daily.json").then((response) => {
+        //await axios.get("http://my-json-server.typicode.com/isogunro/jsondb/chartData").then((response) => {
+        //await axios.get("https://my-json-server.typicode.com/isogunro/jsondb/IceCream").then((response) => {
+        console.log(response.data)
+        this.getChartData(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    },
+    getChartData: function (chartData) {
+      //console.log(chartData);
+      
+      for (var i = 0; i < chartData.length; i++) {
+        this.ChartConfig.labels.push(chartData[i].timestamp.split('T'))
+        //this.$set(this.ChartConfig.labels,i,chartData[i].Flavor)
+      }
+
+      for (var v = 0; v < chartData.length; v++) {
+       this.ChartConfig.datasets[0].data.push(chartData[v].amount)
+       this.ChartConfig.datasets[1].data.push(chartData[v].amount) //di ko pa alam kung pano mababago
+                                                                    // yun sa level dapat sa hover kita yun
+                                                                    //Torrential kaso nag eerror pag string
+        //this.$set(this.ChartConfig.labels,i,chartData[i].Vote)
+      }
+
+      console.log(this.ChartConfig);
     }
+  }
 }
-</script> 
+</script>
 
 <style scoped>
-    
+  .btn-group{
+    float: right;
+  }
 </style>
